@@ -12,10 +12,10 @@ import {
 	Card,
 	Container,
 	Flex,
-	Heading,
-	Section,
+	Image,
 	Text,
-} from "@radix-ui/themes";
+	Title,
+} from "@mantine/core";
 import { ExitIcon } from "@radix-ui/react-icons";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -51,65 +51,64 @@ export default function ProfileRoute() {
 				lg: "0",
 			}}
 		>
-			<Section position="relative" mt="9">
-				<Spacer size="4xs" />
+			<Box pos="relative" mt="xl">
+				<Spacer size="3xs" />
 
 				<Flex
 					justify="center"
 					align="center"
-					position="absolute"
-					width="100%"
-					className="z-50 -top-10"
+					pos="absolute"
+					w="100%"
+					className="z-50 -top-16"
 				>
-					<img
+					<Image
+						radius="xl"
 						src={getUserImgSrc(data.user.image?.id)}
 						alt={userDisplayName}
 						className="h-52 w-52 rounded-full object-cover"
 					/>
 				</Flex>
 
-				<Card asChild>
-					<Flex
-						direction="column"
-						align="center"
-						p="6"
-						className="container rounded-3xl"
-					>
+				<Card shadow="sm" padding="lg" radius="md" withBorder>
+					<Flex direction="column" align="center" p="6" className="rounded-3xl">
 						<Spacer size="sm" />
 
 						<Flex direction="column" align="center">
-							<Flex wrap="wrap" align="center" justify="center" gap="4">
-								<Heading size="7" className="text-center">
-									{userDisplayName}
-								</Heading>
+							<Flex wrap="wrap" align="center" justify="center" gap="md">
+								<Title className="text-center">{userDisplayName}</Title>
 							</Flex>
-							<Text as="p" mt="2" className="text-center">
+							<Text component="p" mt="sm" className="text-center">
 								Joined {data.userJoinedDisplay}
 							</Text>
 							{isLoggedInUser ? (
 								<Form action="/logout" method="POST" className="mt-3">
-									<Button type="submit" variant="ghost">
-										<ExitIcon className="scale-125 max-md:scale-150" />
+									<Button
+										type="submit"
+										variant="subtle"
+										leftSection={
+											<ExitIcon className="scale-125 max-md:scale-150" />
+										}
+									>
 										Logout
 									</Button>
 								</Form>
 							) : null}
-							<Flex gap="4" mt="7">
+							<Flex gap="md" mt="md">
 								{isLoggedInUser ? (
 									<>
-										<Button asChild>
+										<Button>
 											<Link to="notes" prefetch="intent">
 												My notes
 											</Link>
 										</Button>
-										<Button asChild>
+										<Button>
 											<Link to="/settings/profile" prefetch="intent">
 												Edit profile
 											</Link>
 										</Button>
 									</>
 								) : (
-									<Button asChild>
+									<Button>
 										<Link to="notes" prefetch="intent">
 											{userDisplayName}'s notes
 										</Link>
@@ -119,7 +118,7 @@ export default function ProfileRoute() {
 						</Flex>
 					</Flex>
 				</Card>
-			</Section>
+			</Box>
 		</Container>
 	);
 }

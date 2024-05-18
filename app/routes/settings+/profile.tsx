@@ -8,7 +8,7 @@ import { requireUserId } from "#app/utils/auth.server.ts";
 import { prisma } from "#app/utils/db.server.ts";
 import { useUser } from "#app/utils/user.ts";
 import { ChevronRightIcon, FileTextIcon } from "@radix-ui/react-icons";
-import { Button, Card, Container, Flex } from "@radix-ui/themes";
+import { Button, Card, Container, Flex } from "@mantine/core";
 import React from "react";
 
 export const BreadcrumbHandle = z.object({ breadcrumb: z.any() });
@@ -16,8 +16,7 @@ export type BreadcrumbHandle = z.infer<typeof BreadcrumbHandle>;
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
-			<FileTextIcon />
+		<Button variant="subtle" leftSection={<FileTextIcon />}>
 			Edit Profile
 		</Button>
 	),
@@ -54,11 +53,15 @@ export default function EditUserProfile() {
 		.filter(Boolean);
 
 	return (
-		<Container size="2" mb="6" mt="5">
+		<Container size="xl" w="100%" my="lg">
 			<Container>
 				<Flex gap="3" align="center">
-					<Button variant="ghost" asChild>
-						<Link to={`/users/${user.username}`}>Profile</Link>
+					<Button
+						variant="subtle"
+						component={Link}
+						to={`/users/${user.username}`}
+					>
+						Profile
 					</Button>
 
 					{breadcrumbs.map((breadcrumb, i, arr) => (

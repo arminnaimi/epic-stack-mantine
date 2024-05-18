@@ -28,12 +28,12 @@ import {
 } from "#app/utils/misc.tsx";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { AvatarIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
-import { Box, Button, Flex, Text } from "@radix-ui/themes";
+import { Box, Button, Flex, Text } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
-			<AvatarIcon /> Photo
+		<Button leftSection={<AvatarIcon />} variant="subtle">
+			Photo
 		</Button>
 	),
 	getSitemapEntries: () => null,
@@ -164,7 +164,7 @@ export default function PhotoRoute() {
 					alt={data.user?.name ?? data.user?.username}
 				/>
 				<ErrorList errors={fields.photoFile.errors} id={fields.photoFile.id} />
-				<Flex gap="4">
+				<Flex gap="md">
 					{/*
 						We're doing some kinda odd things to make it so this works well
 						without JavaScript. Basically, we're using CSS to ensure the right
@@ -189,12 +189,12 @@ export default function PhotoRoute() {
 						}}
 					/>
 					<Button
-						asChild
-						className="cursor-pointer peer-valid:hidden peer-focus-within:ring-2 peer-focus-visible:ring-2"
+						component="label"
+						htmlFor={fields.photoFile.id}
+						leftSection={<Pencil1Icon />}
+						className="peer-valid:hidden peer-focus-within:ring-2 peer-focus-visible:ring-2"
 					>
-						<Text as="label" htmlFor={fields.photoFile.id}>
-							<Pencil1Icon /> Change
-						</Text>
+						Change
 					</Button>
 					<Button
 						name="intent"
@@ -220,14 +220,14 @@ export default function PhotoRoute() {
 							loading={
 								pendingIntent === "delete" || lastSubmissionIntent === "delete"
 							}
+							color="red"
+							leftSection={<TrashIcon />}
 							{...doubleCheckDeleteImage.getButtonProps({
 								type: "submit",
 								name: "intent",
 								value: "delete",
 							})}
-							color="red"
 						>
-							<TrashIcon />
 							{doubleCheckDeleteImage.doubleCheck ? "Are you sure?" : "Delete"}
 						</Button>
 					) : null}

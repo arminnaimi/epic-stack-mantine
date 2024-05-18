@@ -1,6 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import { logos } from "./logos/logos.ts";
-import { Link, Tooltip } from "@radix-ui/themes";
+import { Anchor, Box, Text, Title, Tooltip } from "@mantine/core";
 import { cn } from "#app/utils/misc.tsx";
 
 export const meta: MetaFunction = () => [{ title: "Epic Notes" }];
@@ -43,25 +43,27 @@ export default function Index() {
 							></path>
 						</svg>
 					</a>
-					<h1
+
+					<Anchor
+						underline="never"
+						href="https://www.epicweb.dev/stack"
 						data-heading
-						className="mt-8 animate-slide-top text-4xl font-medium text-foreground [animation-delay:0.3s] [animation-fill-mode:backwards] md:text-5xl xl:mt-4 xl:animate-slide-left xl:text-6xl xl:[animation-delay:0.8s] xl:[animation-fill-mode:backwards]"
+						mt="lg"
+						className="animate-slide-top font-medium text-foreground [animation-delay:0.3s] [animation-fill-mode:backwards] xl:mt-4 xl:animate-slide-left xl:[animation-delay:0.8s] xl:[animation-fill-mode:backwards]"
 					>
-						<Link href="https://www.epicweb.dev/stack">The Epic Stack</Link>
-					</h1>
-					<p
+						<Title>The Epic Stack</Title>
+					</Anchor>
+					<Text
 						data-paragraph
-						className="mt-6 animate-slide-top text-xl/7 text-muted-foreground [animation-delay:0.8s] [animation-fill-mode:backwards] xl:mt-8 xl:animate-slide-left xl:text-xl/6 xl:leading-10 xl:[animation-delay:1s] xl:[animation-fill-mode:backwards]"
+						mt="xs"
+						className="animate-slide-top [animation-delay:0.8s] [animation-fill-mode:backwards] xl:mt-8 xl:animate-slide-left xl:[animation-delay:1s] xl:[animation-fill-mode:backwards]"
 					>
 						Check the{" "}
-						<Link
-							underline="always"
-							href="https://github.com/epicweb-dev/epic-stack/blob/main/docs/getting-started.md"
-						>
+						<Anchor href="https://github.com/epicweb-dev/epic-stack/blob/main/docs/getting-started.md">
 							Getting Started guide
-						</Link>{" "}
+						</Anchor>{" "}
 						file for how to get your project off the ground!
-					</p>
+					</Text>
 				</div>
 				<ul className="mt-16 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-4 xl:mt-0 xl:grid xl:grid-flow-col xl:grid-cols-5 xl:grid-rows-6">
 					{logos.map((logo, i) => (
@@ -74,13 +76,14 @@ export default function Index() {
 							)}
 							style={{ animationDelay: `${i * 0.07}s` }}
 						>
-							<Tooltip content={logo.alt}>
-								<a
+							<Tooltip label={logo.alt}>
+								<Box
+									component="a"
 									href={logo.href}
 									className="grid size-20 place-items-center rounded-2xl bg-violet-600/10 p-4 transition hover:-rotate-6 hover:bg-violet-600/15 dark:bg-violet-200 dark:hover:bg-violet-100 sm:size-24"
 								>
 									<img src={logo.src} alt="" />
-								</a>
+								</Box>
 							</Tooltip>
 						</li>
 					))}

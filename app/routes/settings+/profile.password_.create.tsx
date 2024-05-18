@@ -8,13 +8,13 @@ import {
 	type ActionFunctionArgs,
 } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { getPasswordHash, requireUserId } from "#app/utils/auth.server.ts";
 import { prisma } from "#app/utils/db.server.ts";
 import { useIsPending } from "#app/utils/misc.tsx";
 import { PasswordAndConfirmPasswordSchema } from "#app/utils/user-validation.ts";
 import type { BreadcrumbHandle } from "./profile.tsx";
-import { Button } from "@radix-ui/themes";
+import { Button, PasswordInput, TextInput } from "@mantine/core";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
@@ -97,27 +97,23 @@ export default function CreatePasswordRoute() {
 
 	return (
 		<Form method="POST" {...getFormProps(form)} className="mx-auto max-w-md">
-			<Field
-				labelProps={{ children: "New Password" }}
-				inputProps={{
-					...getInputProps(fields.password, { type: "password" }),
-					autoComplete: "new-password",
-				}}
-				errors={fields.password.errors}
+			<PasswordInput
+				label="New Password"
+				autoComplete="new-password"
+				error={fields.password.errors}
+				{...getInputProps(fields.password, { type: "password" })}
 			/>
-			<Field
-				labelProps={{ children: "Confirm New Password" }}
-				inputProps={{
-					...getInputProps(fields.confirmPassword, {
-						type: "password",
-					}),
-					autoComplete: "new-password",
-				}}
-				errors={fields.confirmPassword.errors}
+			<PasswordInput
+				label="Confirm New Password"
+				autoComplete="new-password"
+				error={fields.confirmPassword.errors}
+				{...getInputProps(fields.confirmPassword, {
+					type: "password",
+				})}
 			/>
 			<ErrorList id={form.errorId} errors={form.errors} />
 			<div className="grid w-full grid-cols-2 gap-6">
-				<Button variant="outline" asChild>
+				<Button variant="outline">
 					<Link to="..">Cancel</Link>
 				</Button>
 				<Button type="submit" loading={isPending}>

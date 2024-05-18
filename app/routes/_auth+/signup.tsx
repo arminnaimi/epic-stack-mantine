@@ -11,7 +11,7 @@ import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import { HoneypotInputs } from "remix-utils/honeypot/react";
 import { z } from "zod";
 import { GeneralErrorBoundary } from "#app/components/error-boundary.tsx";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import {
 	ProviderConnectionForm,
 	providerNames,
@@ -22,7 +22,7 @@ import { checkHoneypot } from "#app/utils/honeypot.server.ts";
 import { useIsPending } from "#app/utils/misc.tsx";
 import { EmailSchema } from "#app/utils/user-validation.ts";
 import { prepareVerification } from "./verify.server.ts";
-import { Button } from "@radix-ui/themes";
+import { Button, Container, TextInput } from "@mantine/core";
 
 const SignupSchema = z.object({
 	email: EmailSchema,
@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const response = await sendEmail({
 		to: email,
-		subject: `Welcome to Epic Notes!`,
+		subject: "Welcome to Epic Notes!",
 		react: <SignupEmail onboardingUrl={verifyUrl.toString()} otp={otp} />,
 	});
 
@@ -132,7 +132,7 @@ export default function SignupRoute() {
 	});
 
 	return (
-		<div className="container flex flex-col justify-center pb-32 pt-20">
+		<Container className="flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Let's start your journey!</h1>
 				<p className="mt-3 text-body-md text-muted-foreground">
@@ -142,17 +142,12 @@ export default function SignupRoute() {
 			<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
-					<Field
-						labelProps={{
-							htmlFor: fields.email.id,
-							children: "Email",
-						}}
-						inputProps={{
-							...getInputProps(fields.email, { type: "email" }),
-							autoFocus: true,
-							autoComplete: "email",
-						}}
-						errors={fields.email.errors}
+					<TextInput
+						label="Email"
+						autoFocus={true}
+						autoComplete="email"
+						error={fields.email.errors}
+						{...getInputProps(fields.email, { type: "email" })}
 					/>
 					<ErrorList errors={form.errors} id={form.errorId} />
 					<Button loading={isPending} type="submit" disabled={isPending}>
@@ -171,7 +166,7 @@ export default function SignupRoute() {
 					))}
 				</ul>
 			</div>
-		</div>
+		</Container>
 	);
 }
 

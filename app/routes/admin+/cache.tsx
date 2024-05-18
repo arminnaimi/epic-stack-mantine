@@ -15,7 +15,6 @@ import {
 	useSubmit,
 } from "@remix-run/react";
 import { GeneralErrorBoundary } from "#app/components/error-boundary";
-import { Field } from "#app/components/forms.tsx";
 import { Spacer } from "#app/components/spacer.tsx";
 import {
 	cache,
@@ -30,7 +29,7 @@ import {
 } from "#app/utils/litefs.server.ts";
 import { useDebounce, useDoubleCheck } from "#app/utils/misc.tsx";
 import { requireUserWithRole } from "#app/utils/permissions.server.ts";
-import { Button } from "@radix-ui/themes";
+import { Button, TextInput } from "@mantine/core";
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -103,7 +102,7 @@ export default function CacheAdminRoute() {
 	}, 400);
 
 	return (
-		<div className="container">
+		<div className="">
 			<h1 className="text-h1">Cache Admin</h1>
 			<Spacer size="2xs" />
 			<Form
@@ -119,14 +118,12 @@ export default function CacheAdminRoute() {
 						>
 							🔎
 						</button>
-						<Field
+						<TextInput
 							className="flex-1"
-							labelProps={{ children: "Search" }}
-							inputProps={{
-								type: "search",
-								name: "query",
-								defaultValue: query,
-							}}
+							label="Search"
+							type="search"
+							name="query"
+							defaultValue={query}
 						/>
 						<div className="flex h-16 w-14 items-center text-lg font-medium text-muted-foreground">
 							<span title="Total results shown">
@@ -136,19 +133,15 @@ export default function CacheAdminRoute() {
 					</div>
 				</div>
 				<div className="flex flex-wrap items-center gap-4">
-					<Field
-						labelProps={{
-							children: "Limit",
-						}}
-						inputProps={{
-							name: "limit",
-							defaultValue: limit,
-							type: "number",
-							step: "1",
-							min: "1",
-							max: "10000",
-							placeholder: "results limit",
-						}}
+					<TextInput
+						label="Limit"
+						name="limit"
+						defaultValue={limit}
+						type="number"
+						step="1"
+						min="1"
+						max="10000"
+						placeholder="results limit"
 					/>
 					<select name="instance" defaultValue={instance}>
 						{Object.entries(data.instances).map(([inst, region]) => (
@@ -217,11 +210,7 @@ function CacheKeyRow({
 				<input type="hidden" name="cacheKey" value={cacheKey} />
 				<input type="hidden" name="instance" value={instance} />
 				<input type="hidden" name="type" value={type} />
-				<Button
-					size="2"
-					variant="outline"
-					{...dc.getButtonProps({ type: "submit" })}
-				>
+				<Button variant="outline" {...dc.getButtonProps({ type: "submit" })}>
 					{fetcher.state === "idle"
 						? dc.doubleCheck
 							? "You sure?"

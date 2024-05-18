@@ -14,18 +14,20 @@ import { Form, useActionData } from "@remix-run/react";
 import { useState } from "react";
 import { z } from "zod";
 import { GeneralErrorBoundary } from "#app/components/error-boundary.tsx";
-import { ErrorList, Field, TextareaField } from "#app/components/forms.tsx";
-import { Label } from "#app/components/ui/label";
+import { ErrorList } from "#app/components/forms.tsx";
 import { cn, getNoteImgSrc, useIsPending } from "#app/utils/misc.tsx";
 import type { action } from "./__note-editor.server";
 import {
 	Box,
 	Button,
 	Flex,
-	IconButton,
+	ActionIcon,
 	ScrollArea,
-	TextArea,
-} from "@radix-ui/themes";
+	Textarea,
+	TextInput,
+	Text,
+	Stack,
+} from "@mantine/core";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 
 const titleMinLength = 1;
@@ -84,8 +86,8 @@ export function NoteEditor({
 
 	return (
 		<FormProvider context={form.context}>
-			<Flex direction="column" gap="3" height="100%" justify="between">
-				<ScrollArea scrollbars="vertical">
+			<Flex direction="column" gap="sm" h="100%" justify="space-between">
+				<ScrollArea.Autosize mah={500} scrollbars="y">
 					<Box p="4">
 						<Form
 							method="POST"
@@ -99,30 +101,25 @@ export function NoteEditor({
 				*/}
 							<button type="submit" className="hidden" />
 							{note ? <input type="hidden" name="id" value={note.id} /> : null}
-							<Flex direction="column" gap="1">
-								<Field
-									labelProps={{ children: "Title" }}
-									inputProps={{
-										autoFocus: true,
-										...getInputProps(fields.title, { type: "text" }),
-									}}
-									errors={fields.title.errors}
+							<Flex direction="column" gap="xs">
+								<TextInput
+									label="Title"
+									error={fields.title.errors}
+									autoFocus={true}
+									{...getInputProps(fields.title, { type: "text" })}
 								/>
-								<TextareaField
-									labelProps={{ children: "Content" }}
-									textareaProps={{
-										...getTextareaProps(fields.content),
-									}}
-									errors={fields.content.errors}
+								<Textarea
+									label="Content"
+									error={fields.content.errors}
+									{...getTextareaProps(fields.content)}
 								/>
-								<div>
-									<Label>Images</Label>
-									<Flex direction="column" gap="4">
+								<Box>
+									<Text component="label">Images</Text>
+									<Stack gap="md">
 										{imageList.map((image, index) => {
 											return (
 												<Flex direction="column" align="end" key={image.key}>
-													<IconButton
-														size="1"
+													<ActionIcon
 														color="red"
 														{...form.remove.getButtonProps({
 															name: fields.images.name,
@@ -135,17 +132,17 @@ export function NoteEditor({
 														<span className="sr-only">
 															Remove image {index + 1}
 														</span>
-													</IconButton>
+													</ActionIcon>
 													<ImageChooser meta={image} />
 												</Flex>
 											);
 										})}
-									</Flex>
-								</div>
+									</Stack>
+								</Box>
 								<Button
+									leftSection={<PlusIcon />}
 									{...form.insert.getButtonProps({ name: fields.images.name })}
 								>
-									<PlusIcon />
 									Image
 									<span className="sr-only">Add image</span>
 								</Button>
@@ -153,8 +150,8 @@ export function NoteEditor({
 							<ErrorList id={form.errorId} errors={form.errors} />
 						</Form>
 					</Box>
-				</ScrollArea>
-				<Flex justify="end" gap="3" p="4">
+				</ScrollArea.Autosize>
+				<Flex justify="end" gap="sm" p="md">
 					<Button color="red" {...form.reset.getButtonProps()}>
 						Reset
 					</Button>
@@ -182,9 +179,9 @@ function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
 
 	return (
 		<fieldset {...getFieldsetProps(meta)}>
-			<Flex gap="3">
+			<Flex gap="sm">
 				<Box className="w-32">
-					<Box position="relative" className="h-32 w-32">
+					<Box pos="relative" className="h-32 w-32">
 						<label
 							htmlFor={fields.file.id}
 							className={cn("group absolute h-32 w-32 rounded-lg", {
@@ -235,25 +232,20 @@ function ImageChooser({ meta }: { meta: FieldMetadata<ImageFieldset> }) {
 							/>
 						</label>
 					</Box>
-					<Box minHeight="32px" px="4" pb="3" pt="1">
+					<Box mih="32px" px="md" pb="sm" pt="xs">
 						<ErrorList id={fields.file.errorId} errors={fields.file.errors} />
 					</Box>
 				</Box>
-				<Box flexShrink="1">
-					<Label htmlFor={fields.altText.id}>Alt Text</Label>
-					<TextArea
+				<Box>
+					{/* <Label htmlFor={fields.altText.id}>Alt Text</Label> */}
+					<Textarea
+						error={fields.altText.errors}
 						onChange={(e) => setAltText(e.currentTarget.value)}
 						{...getTextareaProps(fields.altText)}
 					/>
-					<Box minHeight="32px" px="4" pb="3" pt="1">
-						<ErrorList
-							id={fields.altText.errorId}
-							errors={fields.altText.errors}
-						/>
-					</Box>
 				</Box>
 			</Flex>
-			<Box minHeight="32px" px="4" pb="3" pt="1">
+			<Box mih="32px" px="md" pb="sm" pt="xs">
 				<ErrorList id={meta.errorId} errors={meta.errors} />
 			</Box>
 		</fieldset>

@@ -13,11 +13,11 @@ import { redirectWithToast } from "#app/utils/toast.server.ts";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { twoFAVerificationType } from "./profile.two-factor.tsx";
 import { LockOpen1Icon } from "@radix-ui/react-icons";
-import { Button, Container, Text } from "@radix-ui/themes";
+import { Button, Container, Text } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
+		<Button variant="subtle">
 			<LockOpen1Icon /> Disable
 		</Button>
 	),
@@ -46,7 +46,7 @@ export default function TwoFactorDisableRoute() {
 	const dc = useDoubleCheck();
 
 	return (
-		<Container className="mx-auto max-w-sm">
+		<Container>
 			<disable2FAFetcher.Form method="POST">
 				<Text>
 					Disabling two factor authentication is not recommended. However, if

@@ -9,12 +9,12 @@ import {
 } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { GeneralErrorBoundary } from "#app/components/error-boundary.tsx";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { requireAnonymous, resetUserPassword } from "#app/utils/auth.server.ts";
 import { useIsPending } from "#app/utils/misc.tsx";
 import { PasswordAndConfirmPasswordSchema } from "#app/utils/user-validation.ts";
 import { verifySessionStorage } from "#app/utils/verification.server.ts";
-import { Button } from "@radix-ui/themes";
+import { Button, Container, PasswordInput } from "@mantine/core";
 
 export const resetPasswordUsernameSessionKey = "resetPasswordUsername";
 
@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
 	});
 
 	return (
-		<div className="container flex flex-col justify-center pb-32 pt-20">
+		<Container className="flex flex-col justify-center pb-32 pt-20">
 			<div className="text-center">
 				<h1 className="text-h1">Password Reset</h1>
 				<p className="mt-3 text-body-md text-muted-foreground">
@@ -91,28 +91,18 @@ export default function ResetPasswordPage() {
 			</div>
 			<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
 				<Form method="POST" {...getFormProps(form)}>
-					<Field
-						labelProps={{
-							htmlFor: fields.password.id,
-							children: "New Password",
-						}}
-						inputProps={{
-							...getInputProps(fields.password, { type: "password" }),
-							autoComplete: "new-password",
-							autoFocus: true,
-						}}
-						errors={fields.password.errors}
+					<PasswordInput
+						label="New Password"
+						autoComplete="new-password"
+						autoFocus={true}
+						error={fields.password.errors}
+						{...getInputProps(fields.password, { type: "password" })}
 					/>
-					<Field
-						labelProps={{
-							htmlFor: fields.confirmPassword.id,
-							children: "Confirm Password",
-						}}
-						inputProps={{
-							...getInputProps(fields.confirmPassword, { type: "password" }),
-							autoComplete: "new-password",
-						}}
-						errors={fields.confirmPassword.errors}
+					<PasswordInput
+						label="Confirm Password"
+						autoComplete="new-password"
+						error={fields.confirmPassword.errors}
+						{...getInputProps(fields.confirmPassword, { type: "password" })}
 					/>
 
 					<ErrorList errors={form.errors} id={form.errorId} />
@@ -122,7 +112,7 @@ export default function ResetPasswordPage() {
 					</Button>
 				</Form>
 			</div>
-		</div>
+		</Container>
 	);
 }
 

@@ -9,12 +9,14 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import {
 	Box,
 	Button,
+	Card,
 	Container,
 	Flex,
 	Grid,
-	Heading,
 	ScrollArea,
-} from "@radix-ui/themes";
+	Stack,
+	Title,
+} from "@mantine/core";
 
 export async function loader({ params }: LoaderFunctionArgs) {
 	const owner = await prisma.user.findFirst({
@@ -40,75 +42,82 @@ export default function NotesRoute() {
 	const ownerDisplayName = data.owner.name ?? data.owner.username;
 
 	return (
-		<Flex pb="6" minHeight="400px" height="100%" px="6" className="container">
-			<Grid columns="4" width="100%">
-				<Box
-					position="relative"
-					gridColumn="1"
-					className="bg-[var(--gray-3)] md:rounded-l-3xl"
-				>
-					<Flex direction="column" inset="0" position="absolute">
-						<Flex
-							direction={{ initial: "column", lg: "row" }}
-							align="center"
-							justify={{ initial: "center", lg: "start" }}
-							gap={{ initial: "2", lg: "4" }}
-							pb="4"
-							pl="8"
-							pr="4"
-							pt="4"
-							asChild
-						>
-							<Link to={`/users/${data.owner.username}`}>
-								<img
-									src={getUserImgSrc(data.owner.image?.id)}
-									alt={ownerDisplayName}
-									className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
-								/>
-								<Heading
-									size={{ initial: "4", md: "5", lg: "6" }}
-									align={{
-										initial: "center",
-										lg: "left",
-									}}
+		<Container size="xl" w="100%" pb="lg" mih="400px" h="100%" py="xl">
+			<Card shadow="xl" radius="xl" h="100%">
+				<Grid columns={4} w="100%" h="100%">
+					<Grid.Col
+						span={1}
+						pos="relative"
+						h="100%"
+						className="bg-[var(--gray-3)] md:rounded-l-3xl"
+					>
+						<Flex direction="column" inset="0" pos="absolute">
+							<Stack gap="xs" mb="xs" px="sm">
+								<Flex
+									direction={{ initial: "column", lg: "row" }}
+									align="center"
+									justify={{ initial: "center", lg: "start" }}
+									gap={{ initial: "sm", lg: "md" }}
+									pb="md"
+									pl="xl"
+									pr="md"
+									pt="md"
 								>
-									{ownerDisplayName}'s Notes
-								</Heading>
-							</Link>
-						</Flex>
-
-						<ScrollArea scrollbars="vertical">
-							<Flex direction="column" gap="2" px="3">
+									<Link to={`/users/${data.owner.username}`}>
+										<img
+											src={getUserImgSrc(data.owner.image?.id)}
+											alt={ownerDisplayName}
+											className="h-16 w-16 rounded-full object-cover lg:h-24 lg:w-24"
+										/>
+										<Title
+											order={1}
+											ta={{
+												base: "center",
+												lg: "left",
+											}}
+										>
+											{ownerDisplayName}'s Notes
+										</Title>
+									</Link>
+								</Flex>
 								{isOwner ? (
-									<Button asChild>
-										<NavLink to="new">
-											<PlusIcon />
-											New Note
-										</NavLink>
+									<Button
+										component={NavLink}
+										leftSection={<PlusIcon />}
+										to="new"
+									>
+										New Note
 									</Button>
 								) : null}
-								{data.owner.notes.map((note) => (
-									<Button key={note.id} variant="soft" asChild>
-										<NavLink to={note.id} preventScrollReset prefetch="intent">
+							</Stack>
+
+							<Box>
+								<Flex direction="column" gap="sm" px="sm">
+									{data.owner.notes.map((note) => (
+										<Button
+											key={note.id}
+											component={NavLink}
+											to={note.id}
+											preventScrollReset
+											prefetch="intent"
+										>
 											{note.title}
-										</NavLink>
-									</Button>
-								))}
-							</Flex>
-						</ScrollArea>
-					</Flex>
-				</Box>
-				<Box
-					position="relative"
-					gridColumn="3"
-					gridColumnStart="2"
-					gridColumnEnd="5"
-					className="bg-[var(--olive-2)] md:rounded-r-3xl"
-				>
-					<Outlet />
-				</Box>
-			</Grid>
-		</Flex>
+										</Button>
+									))}
+								</Flex>
+							</Box>
+						</Flex>
+					</Grid.Col>
+					<Grid.Col
+						pos="relative"
+						span={3}
+						className="bg-[var(--olive-2)] md:rounded-r-3xl"
+					>
+						<Outlet />
+					</Grid.Col>
+				</Grid>
+			</Card>
+		</Container>
 	);
 }
 

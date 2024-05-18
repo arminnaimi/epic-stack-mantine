@@ -32,15 +32,15 @@ import {
 	Button,
 	Container,
 	Flex,
-	IconButton,
-	Link,
+	ActionIcon,
+	Anchor,
 	Text,
 	Tooltip,
-} from "@radix-ui/themes";
+} from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
+		<Button variant="subtle">
 			<Link2Icon />
 			Connections
 		</Button>
@@ -139,11 +139,11 @@ export default function Connections() {
 	const data = useLoaderData<typeof loader>();
 
 	return (
-		<Container size="2">
+		<Container>
 			{data.connections.length ? (
-				<Flex direction="column" gap="2">
-					<Text as="p">Here are your current connections:</Text>
-					<Flex direction="column" gap="4">
+				<Flex direction="column" gap="sm">
+					<Text component="p">Here are your current connections:</Text>
+					<Flex direction="column" gap="md">
 						{data.connections.map((c) => (
 							<Connection
 								key={c.id}
@@ -154,13 +154,13 @@ export default function Connections() {
 					</Flex>
 				</Flex>
 			) : (
-				<Text as="p">You don't have any connections yet.</Text>
+				<Text component="p">You don't have any connections yet.</Text>
 			)}
 			<Flex
 				direction="column"
-				gap="5"
-				mt="5"
-				py="3"
+				gap="lg"
+				mt="lg"
+				py="sm"
 				className="border-b border-t border-border"
 			>
 				{providerNames.map((providerName) => (
@@ -186,14 +186,14 @@ function Connection({
 	const [infoOpen, setInfoOpen] = useState(false);
 	const icon = providerIcons[connection.providerName];
 	return (
-		<Flex justify="between" gap="2">
-			<Flex as="span" display="inline-flex" align="center" gap="2">
+		<Flex justify="space-between" gap="sm">
+			<Flex component="span" display="inline-flex" align="center" gap="sm">
 				{icon}
-				<Box as="span">
+				<Box component="span">
 					{connection.link ? (
-						<Link href={connection.link} underline="always">
+						<Anchor href={connection.link} underline="always">
 							{connection.displayName}
-						</Link>
+						</Anchor>
 					) : (
 						connection.displayName
 					)}{" "}
@@ -203,26 +203,25 @@ function Connection({
 			{canDelete ? (
 				<deleteFetcher.Form method="POST">
 					<input name="connectionId" value={connection.id} type="hidden" />
-					<Tooltip content="Disconnect this account">
-						<IconButton
+					<Tooltip label="Disconnect this account">
+						<ActionIcon
 							name="intent"
 							value="delete-connection"
 							color="red"
-							size="2"
 							loading={deleteFetcher.state !== "idle"}
 						>
 							<Cross1Icon />
-						</IconButton>
+						</ActionIcon>
 					</Tooltip>
 				</deleteFetcher.Form>
 			) : (
 				<Tooltip
-					open={infoOpen}
-					onOpenChange={setInfoOpen}
-					onClick={() => setInfoOpen(true)}
-					content="You cannot delete your last connection unless you have a password."
+					opened={infoOpen}
+					label="You cannot delete your last connection unless you have a password."
 				>
-					<QuestionMarkCircledIcon />
+					<ActionIcon onClick={() => setInfoOpen(true)}>
+						<QuestionMarkCircledIcon />
+					</ActionIcon>
 				</Tooltip>
 			)}
 		</Flex>

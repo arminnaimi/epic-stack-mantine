@@ -1,0 +1,106 @@
+/* Use `&:focus-visible` when you want focus ring to be visible
+   only when user navigates with keyboard, for example by pressing Tab key */
+.focus {
+  &:focus-visible {
+    outline: 2px solid var(--mantine-color-indigo-2);
+    outline-offset: 0;
+  }
+}
+
+.active {
+  &:active {
+    box-shadow: inset var(--mantine-shadow-xs);
+  }
+}
+
+.option {
+  &:hover {
+    background: var(--mantine-primary-color-light-hover);
+  }
+}
+
+.section {
+  font-size: var(--mantine-font-size-xs);
+  color: var(--mantine-color-gray-8);
+}
+
+.input {
+  &[data-variant='default'] {
+    --input-bd: lighten(var(--mantine-color-default-border), 0.5);
+
+    &:focus-within {
+      border-color: var(--mantine-primary-color-filled);
+    }
+  }
+
+  &[data-variant='filled'] {
+    --input-bd: lighten(var(--mantine-color-default-border), 0.5);
+
+    @mixin light {
+      --input-bg: var(--mantine-color-gray-0);
+    }
+
+    @mixin dark {
+      --input-bd: var(--mantine-color-dark-4);
+      --input-bg: var(--mantine-color-dark-6);
+    }
+
+    &:focus-within {
+      border-color: var(--mantine-primary-color-filled);
+    }
+  }
+}
+
+.button {
+  &[data-variant='default'] {
+    border-color: lighten(var(--mantine-color-default-border), 0.5);
+  }
+}
+
+.drawer {
+  border-top-left-radius: var(--mantine-radius-lg);
+  border-bottom-left-radius: var(--mantine-radius-lg);
+
+  @mixin smaller-than $mantine-breakpoint-sm {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.tab {
+  background: none;
+
+  @mixin hover {
+    border-bottom: 2px solid var(--mantine-color-dark-3);
+  }
+}
+
+.modalHeader {
+  padding-top: 0;
+
+  @mixin light {
+    background-color: var(--mantine-color-white);
+  }
+}
+
+.closeButton {
+  @mixin dark {
+    background-color: var(--mantine-color-dark-5);
+  }
+
+  @mixin light {
+    background-color: var(--mantine-color-gray-1);
+  }
+}
+
+.drawerHeader {
+  @mixin light {
+    background-color: var(--mantine-color-white);
+  }
+}
+
+.paper {
+  @mixin light {
+    background-color: var(--mantine-color-white);
+  }
+}

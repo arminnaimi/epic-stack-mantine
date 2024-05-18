@@ -6,6 +6,7 @@ import {
 } from "@remix-run/react";
 import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import { getErrorMessage } from "#app/utils/misc.tsx";
+import { Container } from "@mantine/core";
 
 type StatusHandler = (info: {
 	error: ErrorResponse;
@@ -34,13 +35,13 @@ export function GeneralErrorBoundary({
 	}
 
 	return (
-		<div className="container flex items-center justify-center p-20 text-h2">
+		<Container className="flex items-center justify-center p-20 text-h2">
 			{isRouteErrorResponse(error)
 				? (statusHandlers?.[error.status] ?? defaultStatusHandler)({
 						error,
 						params,
 					})
 				: unexpectedErrorHandler(error)}
-		</div>
+		</Container>
 	);
 }

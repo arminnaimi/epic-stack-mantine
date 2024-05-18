@@ -12,7 +12,7 @@ import { generateTOTP } from "#app/utils/totp.server.ts";
 import { twoFAVerificationType } from "./profile.two-factor.tsx";
 import { twoFAVerifyVerificationType } from "./profile.two-factor.verify.tsx";
 import { CheckIcon, LockOpen1Icon } from "@radix-ui/react-icons";
-import { Button, Flex, Text, Link as RadixLink } from "@radix-ui/themes";
+import { Button, Flex, Text, Anchor } from "@mantine/core";
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -50,14 +50,14 @@ export default function TwoFactorRoute() {
 	const enable2FAFetcher = useFetcher<typeof action>();
 
 	return (
-		<Flex direction="column" gap="4">
+		<Flex direction="column" gap="md">
 			{data.is2FAEnabled ? (
 				<>
-					<Text size="6">
+					<Text>
 						<CheckIcon name="check" />
 						You have enabled two-factor authentication.
 					</Text>
-					<Button asChild>
+					<Button>
 						<Link to="disable">
 							<LockOpen1Icon name="lock-open-1" />
 							Disable 2FA
@@ -66,19 +66,19 @@ export default function TwoFactorRoute() {
 				</>
 			) : (
 				<>
-					<Flex align="center" gap="2">
+					<Flex align="center" gap="sm">
 						<LockOpen1Icon name="lock-open-1" />
-						<Text as="div">
+						<Text component="div">
 							You have not enabled two-factor authentication yet.
 						</Text>
 					</Flex>
-					<Text size="2">
+					<Text size="sm">
 						Two factor authentication adds an extra layer of security to your
 						account. You will need to enter a code from an authenticator app
 						like{" "}
-						<RadixLink underline="always" href="https://1password.com/">
+						<Anchor underline="always" href="https://1password.com/">
 							1Password
-						</RadixLink>{" "}
+						</Anchor>{" "}
 						to log in.
 					</Text>
 					<enable2FAFetcher.Form method="POST">

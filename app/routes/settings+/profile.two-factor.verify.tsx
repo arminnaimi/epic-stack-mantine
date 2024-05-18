@@ -15,7 +15,7 @@ import {
 } from "@remix-run/react";
 import * as QRCode from "qrcode";
 import { z } from "zod";
-import { ErrorList, OTPField } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { isCodeValid } from "#app/routes/_auth+/verify.server.ts";
 import { requireUserId } from "#app/utils/auth.server.ts";
 import { prisma } from "#app/utils/db.server.ts";
@@ -25,11 +25,11 @@ import { getTOTPAuthUri } from "#app/utils/totp.server.ts";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { twoFAVerificationType } from "./profile.two-factor.tsx";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { AspectRatio, Box, Button, Code, Flex, Text } from "@radix-ui/themes";
+import { Box, Button, Code, Flex, PinInput, Text } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
+		<Button variant="subtle">
 			<CheckIcon />
 			Verify
 		</Button>
@@ -156,51 +156,46 @@ export default function TwoFactorRoute() {
 
 	return (
 		<Box>
-			<Flex direction="column" align="center" gap="4">
+			<Flex direction="column" align="center" gap="md">
 				<img alt="qr code" src={data.qrCode} className="h-56 w-56" />
-				<Text as="p">Scan this QR code with your authenticator app.</Text>
-				<Text as="p" size="2">
+				<Text component="p">
+					Scan this QR code with your authenticator app.
+				</Text>
+				<Text component="p">
 					If you cannot scan the QR code, you can manually add this account to
 					your authenticator app using this code:
 				</Text>
 				<Box p="3">
 					<Code
-						size="2"
 						className="whitespace-pre-wrap break-all"
 						aria-label="One-time Password URI"
 					>
 						{data.otpUri}
 					</Code>
 				</Box>
-				<Text as="p" size="2">
+				<Text component="p">
 					Once you've added the account, enter the code from your authenticator
 					app below. Once you enable 2FA, you will need to enter a code from
 					your authenticator app every time you log in or perform important
 					actions. Do not lose access to your authenticator app, or you will
 					lose access to your account.
 				</Text>
-				<Flex direction="column" width="100%" justify="center" gap="4">
+				<Flex direction="column" w="100%" justify="center" gap="md">
 					<Form method="POST" {...getFormProps(form)} className="flex-1">
 						<Flex align="center" justify="center">
-							<OTPField
-								labelProps={{
-									htmlFor: fields.code.id,
-									children: "Code",
-								}}
-								inputProps={{
-									...getInputProps(fields.code, { type: "text" }),
-									autoFocus: true,
-									autoComplete: "one-time-code",
-								}}
-								errors={fields.code.errors}
+							<PinInput
+								autoFocus={true}
+								oneTimeCode
+								error={!!fields.code.errors}
+								{...getInputProps(fields.code, { type: "number" })}
 							/>
 						</Flex>
 
-						<Box minHeight="32px" px="4" pb="3" pt="1">
+						<Box mih="32px" px="md" pb="sm" pt="xs">
 							<ErrorList id={form.errorId} errors={form.errors} />
 						</Box>
 
-						<Flex justify="center" gap="4">
+						<Flex justify="center" gap="md">
 							<Button
 								loading={
 									pendingIntent === "verify" ||

@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { createRequestHandler as _createRequestHandler } from "@remix-run/express";
 import { type ServerBuild, installGlobals } from "@remix-run/node";
 import * as Sentry from "@sentry/remix";
@@ -216,6 +216,7 @@ if (!ALLOW_INDEXING) {
 app.all(
 	"*",
 	createRequestHandler({
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		getLoadContext: (_: any, res: any) => ({
 			cspNonce: res.locals.cspNonce,
 			serverBuild: getBuild(),
@@ -243,8 +244,8 @@ const server = app.listen(portToUse, () => {
 			),
 		);
 	}
-	console.log(`🚀  We have liftoff!`);
-	const localUrl = `http://localhost:${portToUse}`;
+	console.log("🚀  We have liftoff!");
+	const localUrl = "http://localhost:${portToUse}";
 	let lanUrl: string | null = null;
 	const localIp = ipAddress() ?? "Unknown";
 	// Check if the address is a private ip

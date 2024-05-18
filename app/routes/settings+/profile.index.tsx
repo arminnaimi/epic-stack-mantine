@@ -9,7 +9,7 @@ import {
 } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { requireUserId, sessionKey } from "#app/utils/auth.server.ts";
 import { prisma } from "#app/utils/db.server.ts";
 import { getUserImgSrc, useDoubleCheck } from "#app/utils/misc.tsx";
@@ -28,7 +28,15 @@ import {
 	LockOpen1Icon,
 	TrashIcon,
 } from "@radix-ui/react-icons";
-import { Box, Button, Flex, IconButton, Separator } from "@radix-ui/themes";
+import {
+	Box,
+	Button,
+	Divider,
+	Flex,
+	ActionIcon,
+	TextInput,
+	SimpleGrid,
+} from "@mantine/core";
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -113,82 +121,78 @@ export default function EditUserProfile() {
 	const data = useLoaderData<typeof loader>();
 
 	return (
-		<Flex direction="column" gap="6">
-			<div className="flex justify-center">
-				<div className="relative h-52 w-52">
+		<Flex direction="column" gap="xl">
+			<Flex justify="center">
+				<Box pos="relative" className="h-52 w-52">
 					<img
 						src={getUserImgSrc(data.user.image?.id)}
 						alt={data.user.username}
 						className="h-full w-full rounded-full object-cover"
 					/>
-					<IconButton
-						asChild
+					<ActionIcon
+						component={Link}
 						variant="soft"
-						className="absolute -right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full p-0"
+						pos="absolute"
+						right={-3}
+						top={3}
+						className="flex h-10 w-10 items-center justify-center rounded-full p-0"
+						preventScrollReset
+						to="photo"
+						title="Change profile photo"
+						aria-label="Change profile photo"
 					>
-						<Link
-							preventScrollReset
-							to="photo"
-							title="Change profile photo"
-							aria-label="Change profile photo"
-						>
-							<CameraIcon />
-						</Link>
-					</IconButton>
-				</div>
-			</div>
+						<CameraIcon />
+					</ActionIcon>
+				</Box>
+			</Flex>
 			<UpdateProfile />
 
-			<Separator size="4" />
+			<Divider />
 
 			<div className="col-span-full flex flex-col gap-6">
 				<Box>
-					<Button asChild>
-						<Link to="change-email">
-							<EnvelopeClosedIcon /> Change email from {data.user.email}
-						</Link>
+					<Button
+						component={Link}
+						leftSection={<EnvelopeClosedIcon />}
+						to="change-email"
+					>
+						Change email from {data.user.email}
 					</Button>
 				</Box>
 				<Box>
-					<Button asChild>
-						<Link to="two-factor">
-							{data.isTwoFactorEnabled ? (
-								<>
-									<LockClosedIcon /> 2FA is enabled
-								</>
-							) : (
-								<>
-									<LockOpen1Icon /> Enable 2FA
-								</>
-							)}
-						</Link>
+					<Button
+						component={Link}
+						leftSection={
+							data.isTwoFactorEnabled ? <LockClosedIcon /> : <LockOpen1Icon />
+						}
+						to="two-factor"
+					>
+						{data.isTwoFactorEnabled ? <>2FA is enabled</> : <>Enable 2FA</>}
 					</Button>
 				</Box>
 				<Box>
-					<Button asChild>
-						<Link to={data.hasPassword ? "password" : "password/create"}>
-							<DotsHorizontalIcon />{" "}
-							{data.hasPassword ? "Change Password" : "Create a Password"}
-						</Link>
+					<Button
+						component={Link}
+						leftSection={<DotsHorizontalIcon />}
+						to={data.hasPassword ? "password" : "password/create"}
+					>
+						{data.hasPassword ? "Change Password" : "Create a Password"}
 					</Button>
 				</Box>
 				<Box>
-					<Button asChild>
-						<Link to="connections">
-							<Link2Icon /> Manage connections
-						</Link>
+					<Button component={Link} leftSection={<Link2Icon />} to="connections">
+						Manage connections
 					</Button>
 				</Box>
 				<Box>
-					<Button asChild>
-						<Link
-							reloadDocument
-							download="my-epic-notes-data.json"
-							to="/resources/download-user-data"
-						>
-							<DownloadIcon />
-							Download your data
-						</Link>
+					<Button
+						component={Link}
+						leftSection={<DownloadIcon />}
+						reloadDocument
+						download="my-epic-notes-data.json"
+						to="/resources/download-user-data"
+					>
+						Download your data
 					</Button>
 				</Box>
 				<SignOutOfSessions />
@@ -258,27 +262,24 @@ function UpdateProfile() {
 
 	return (
 		<fetcher.Form method="POST" {...getFormProps(form)}>
-			<div className="grid grid-cols-6 gap-x-10">
-				<Field
+			<SimpleGrid cols={6}>
+				<TextInput
 					className="col-span-3"
-					labelProps={{
-						htmlFor: fields.username.id,
-						children: "Username",
-					}}
-					inputProps={getInputProps(fields.username, { type: "text" })}
-					errors={fields.username.errors}
+					label="Username"
+					error={fields.username.errors}
+					{...getInputProps(fields.username, { type: "text" })}
 				/>
-				<Field
+				<TextInput
 					className="col-span-3"
-					labelProps={{ htmlFor: fields.name.id, children: "Name" }}
-					inputProps={getInputProps(fields.name, { type: "text" })}
-					errors={fields.name.errors}
+					label="Name"
+					error={fields.name.errors}
+					{...getInputProps(fields.name, { type: "text" })}
 				/>
-			</div>
+			</SimpleGrid>
 
 			<ErrorList errors={form.errors} id={form.errorId} />
 
-			<Flex justify="center" mt="4">
+			<Flex justify="center" mt="xl">
 				<Button
 					type="submit"
 					name="intent"
@@ -321,26 +322,22 @@ function SignOutOfSessions() {
 			{otherSessionsCount ? (
 				<fetcher.Form method="POST">
 					<Button
+						color={dc.doubleCheck ? "red" : undefined}
+						loading={fetcher.state !== "idle"}
+						leftSection={<AvatarIcon />}
 						{...dc.getButtonProps({
 							type: "submit",
 							name: "intent",
 							value: signOutOfSessionsActionIntent,
 						})}
-						color={dc.doubleCheck ? "red" : undefined}
-						loading={fetcher.state !== "idle"}
 					>
-						<AvatarIcon />
-
 						{dc.doubleCheck
 							? "Are you sure?"
 							: `Sign out of ${otherSessionsCount} other sessions`}
 					</Button>
 				</fetcher.Form>
 			) : (
-				<Button>
-					<AvatarIcon />
-					This is your only session
-				</Button>
+				<Button leftSection={<AvatarIcon />}>This is your only session</Button>
 			)}
 		</div>
 	);
@@ -363,15 +360,15 @@ function DeleteData() {
 		<div>
 			<fetcher.Form method="POST">
 				<Button
+					color={dc.doubleCheck ? "red" : undefined}
+					loading={fetcher.state !== "idle"}
+					leftSection={<TrashIcon />}
 					{...dc.getButtonProps({
 						type: "submit",
 						name: "intent",
 						value: deleteDataActionIntent,
 					})}
-					color={dc.doubleCheck ? "red" : undefined}
-					loading={fetcher.state !== "idle"}
 				>
-					<TrashIcon />
 					{dc.doubleCheck ? "Are you sure?" : "Delete all your data"}
 				</Button>
 			</fetcher.Form>

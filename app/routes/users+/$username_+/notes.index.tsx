@@ -1,14 +1,12 @@
 import type { MetaFunction } from "@remix-run/react";
 import type { loader as notesLoader } from "./notes.tsx";
-import { Box, Container, Text } from "@radix-ui/themes";
+import { Box, Container, Text } from "@mantine/core";
 
 export default function NotesIndexRoute() {
 	return (
-		<Container>
-			<Box pt="4" pl="4">
-				<Text size="5">Select a note</Text>
-			</Box>
-		</Container>
+		<Box pt="md" pl="md">
+			<Text>Select a note</Text>
+		</Box>
 	);
 }
 

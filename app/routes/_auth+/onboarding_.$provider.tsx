@@ -21,7 +21,7 @@ import {
 } from "@remix-run/react";
 import { safeRedirect } from "remix-utils/safe-redirect";
 import { z } from "zod";
-import { CheckboxField, ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { Spacer } from "#app/components/spacer.tsx";
 import {
 	authenticator,
@@ -37,7 +37,7 @@ import { redirectWithToast } from "#app/utils/toast.server.ts";
 import { NameSchema, UsernameSchema } from "#app/utils/user-validation.ts";
 import { verifySessionStorage } from "#app/utils/verification.server.ts";
 import { onboardingEmailSessionKey } from "./onboarding";
-import { Button } from "@radix-ui/themes";
+import { Button, Checkbox, TextInput } from "@mantine/core";
 
 export const providerIdKey = "providerId";
 export const prefilledProfileKey = "prefilledProfile";
@@ -194,7 +194,7 @@ export default function SignupRoute() {
 	});
 
 	return (
-		<div className="container flex min-h-full flex-col justify-center pb-32 pt-20">
+		<Container className="flex min-h-full flex-col justify-center pb-32 pt-20">
 			<div className="mx-auto w-full max-w-lg">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Welcome aboard {data.email}!</h1>
@@ -221,43 +221,32 @@ export default function SignupRoute() {
 							<input {...getInputProps(fields.imageUrl, { type: "hidden" })} />
 						</div>
 					) : null}
-					<Field
-						labelProps={{ htmlFor: fields.username.id, children: "Username" }}
-						inputProps={{
-							...getInputProps(fields.username, { type: "text" }),
-							autoComplete: "username",
-							className: "lowercase",
-						}}
-						errors={fields.username.errors}
+					<TextInput
+						label="Username"
+						autoComplete="username"
+						className="lowercase"
+						error={fields.username.errors}
+						{...getInputProps(fields.username, { type: "text" })}
 					/>
-					<Field
-						labelProps={{ htmlFor: fields.name.id, children: "Name" }}
-						inputProps={{
-							...getInputProps(fields.name, { type: "text" }),
-							autoComplete: "name",
-						}}
-						errors={fields.name.errors}
+					<TextInput
+						label="Name"
+						autoComplete="name"
+						className="lowercase"
+						error={fields.name.errors}
+						{...getInputProps(fields.name, { type: "text" })}
 					/>
 
-					<CheckboxField
-						labelProps={{
-							htmlFor: fields.agreeToTermsOfServiceAndPrivacyPolicy.id,
-							children:
-								"Do you agree to our Terms of Service and Privacy Policy?",
-						}}
-						buttonProps={getInputProps(
-							fields.agreeToTermsOfServiceAndPrivacyPolicy,
-							{ type: "checkbox" },
-						)}
-						errors={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
+					<Checkbox
+						label="Do you agree to our Terms of Service and Privacy Policy?"
+						error={fields.agreeToTermsOfServiceAndPrivacyPolicy.errors}
+						{...getInputProps(fields.agreeToTermsOfServiceAndPrivacyPolicy, {
+							type: "checkbox",
+						})}
 					/>
-					<CheckboxField
-						labelProps={{
-							htmlFor: fields.remember.id,
-							children: "Remember me",
-						}}
-						buttonProps={getInputProps(fields.remember, { type: "checkbox" })}
-						errors={fields.remember.errors}
+					<Checkbox
+						label="Remember me"
+						error={fields.remember.errors}
+						{...getInputProps(fields.remember, { type: "checkbox" })}
 					/>
 
 					{redirectTo ? (
@@ -273,6 +262,6 @@ export default function SignupRoute() {
 					</div>
 				</Form>
 			</div>
-		</div>
+		</Container>
 	);
 }

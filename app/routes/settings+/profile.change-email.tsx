@@ -9,7 +9,7 @@ import {
 } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import {
 	prepareVerification,
 	requireRecentVerification,
@@ -23,12 +23,12 @@ import { verifySessionStorage } from "#app/utils/verification.server.ts";
 import { EmailChangeEmail } from "./profile.change-email.server.tsx";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { EnvelopeClosedIcon } from "@radix-ui/react-icons";
-import { Box, Button, Container, Heading, Text } from "@radix-ui/themes";
+import { Box, Button, Container, Text, TextInput, Title } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
-			<EnvelopeClosedIcon /> Change Email
+		<Button leftSection={<EnvelopeClosedIcon />} variant="subtle">
+			Change Email
 		</Button>
 	),
 	getSitemapEntries: () => null,
@@ -123,22 +123,20 @@ export default function ChangeEmailIndex() {
 	const isPending = useIsPending();
 	return (
 		<Box>
-			<Heading size="7">Change Email</Heading>
-			<Text as="p">
+			<Title>Change Email</Title>
+			<Text component="p">
 				You will receive an email at the new email address to confirm.
 			</Text>
-			<Text as="p">
+			<Text component="p">
 				An email notice will also be sent to your old address {data.user.email}.
 			</Text>
 			<Container>
 				<Form method="POST" {...getFormProps(form)}>
-					<Field
-						labelProps={{ children: "New Email" }}
-						inputProps={{
-							...getInputProps(fields.email, { type: "email" }),
-							autoComplete: "email",
-						}}
-						errors={fields.email.errors}
+					<TextInput
+						label="New Email"
+						autoComplete="email"
+						error={fields.email.errors}
+						{...getInputProps(fields.email, { type: "email" })}
 					/>
 					<ErrorList id={form.errorId} errors={form.errors} />
 					<Box>

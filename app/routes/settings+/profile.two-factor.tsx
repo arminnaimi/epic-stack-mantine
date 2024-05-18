@@ -3,11 +3,11 @@ import { Outlet } from "@remix-run/react";
 import type { VerificationTypes } from "#app/routes/_auth+/verify.tsx";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { LockClosedIcon } from "@radix-ui/react-icons";
-import { Button } from "@radix-ui/themes";
+import { Button } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
+		<Button variant="subtle">
 			<LockClosedIcon />
 			2FA
 		</Button>

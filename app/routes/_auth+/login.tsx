@@ -10,7 +10,7 @@ import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import { HoneypotInputs } from "remix-utils/honeypot/react";
 import { z } from "zod";
 import { GeneralErrorBoundary } from "#app/components/error-boundary.tsx";
-import { CheckboxField, ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { Spacer } from "#app/components/spacer.tsx";
 import { login, requireAnonymous } from "#app/utils/auth.server.ts";
 import {
@@ -26,10 +26,14 @@ import {
 	Button,
 	Container,
 	Flex,
-	Heading,
-	Separator,
+	Divider,
 	Text,
-} from "@radix-ui/themes";
+	Title,
+	TextInput,
+	PasswordInput,
+	Checkbox,
+	Anchor,
+} from "@mantine/core";
 
 const LoginFormSchema = z.object({
 	username: UsernameSchema,
@@ -101,104 +105,88 @@ export default function LoginPage() {
 	});
 
 	return (
-		<Flex direction="column" minHeight="100%" justify="center" pb="5" pt="9">
-			<Container size="1">
+		<Flex direction="column" mih="100%" justify="center" pb="md" pt="xl">
+			<Container size="xs" w="100%">
 				<Flex direction="column" gap="3" className="text-center">
-					<Heading size="8">Welcome back!</Heading>
-					<Text size="5">Please enter your details.</Text>
+					<Title>Welcome back!</Title>
+					<Text>Please enter your details.</Text>
 				</Flex>
 				<Spacer size="xs" />
 
 				<Box>
-					<Container>
-						<Flex gap="3" direction="column">
-							<Form method="POST" {...getFormProps(form)}>
-								<HoneypotInputs />
-								<Field
-									labelProps={{ children: "Username" }}
-									inputProps={{
-										...getInputProps(fields.username, { type: "text" }),
-										autoFocus: true,
-										className: "lowercase",
-										autoComplete: "username",
-									}}
-									errors={fields.username.errors}
+					<Flex gap="3" direction="column">
+						<Form method="POST" {...getFormProps(form)}>
+							<HoneypotInputs />
+							<TextInput
+								label="Username"
+								autoFocus={true}
+								autoComplete="username"
+								error={fields.username.errors}
+								{...getInputProps(fields.username, { type: "text" })}
+							/>
+
+							<PasswordInput
+								label="Password"
+								autoComplete="current-password"
+								error={fields.password.errors}
+								{...getInputProps(fields.password, {
+									type: "password",
+								})}
+							/>
+
+							<Flex gap="md" my="sm" align="center" justify="space-between">
+								<Checkbox
+									label="Remember me"
+									error={fields.remember.errors}
+									{...getInputProps(fields.remember, {
+										type: "checkbox",
+									})}
 								/>
 
-								<Field
-									labelProps={{ children: "Password" }}
-									inputProps={{
-										...getInputProps(fields.password, {
-											type: "password",
-										}),
-										autoComplete: "current-password",
-									}}
-									errors={fields.password.errors}
+								<Anchor size="sm" component={Link} to="/forgot-password">
+									Forgot password?
+								</Anchor>
+							</Flex>
+
+							<input
+								{...getInputProps(fields.redirectTo, { type: "hidden" })}
+							/>
+							<ErrorList errors={form.errors} id={form.errorId} />
+
+							<Flex justify="center">
+								<Button type="submit" disabled={isPending} loading={isPending}>
+									Log in
+								</Button>
+							</Flex>
+						</Form>
+
+						<Divider my="lg" />
+
+						<Flex mb="lg" direction="column" gap="lg">
+							{providerNames.map((providerName) => (
+								<ProviderConnectionForm
+									key={providerName}
+									type="Login"
+									providerName={providerName}
+									redirectTo={redirectTo}
 								/>
-
-								<Flex justify="between">
-									<CheckboxField
-										labelProps={{
-											htmlFor: fields.remember.id,
-											children: "Remember me",
-										}}
-										buttonProps={getInputProps(fields.remember, {
-											type: "checkbox",
-										})}
-										errors={fields.remember.errors}
-									/>
-									<div>
-										<Button variant="ghost" asChild>
-											<Link to="/forgot-password">Forgot password?</Link>
-										</Button>
-									</div>
-								</Flex>
-
-								<input
-									{...getInputProps(fields.redirectTo, { type: "hidden" })}
-								/>
-								<ErrorList errors={form.errors} id={form.errorId} />
-
-								<Flex flexGrow="1" justify="center">
-									<Button
-										type="submit"
-										disabled={isPending}
-										loading={isPending}
-									>
-										Log in
-									</Button>
-								</Flex>
-							</Form>
-
-							<Separator size="4" />
-
-							<ul className="flex flex-col gap-5">
-								{providerNames.map((providerName) => (
-									<li key={providerName}>
-										<ProviderConnectionForm
-											type="Login"
-											providerName={providerName}
-											redirectTo={redirectTo}
-										/>
-									</li>
-								))}
-							</ul>
+							))}
 						</Flex>
-						<Flex gap="3" justify="center" align="center" pt="4">
-							<Text size="2">New here?</Text>
-							<Button variant="ghost" asChild>
-								<Link
-									to={
-										redirectTo
-											? `/signup?${encodeURIComponent(redirectTo)}`
-											: "/signup"
-									}
-								>
-									Create an account
-								</Link>
-							</Button>
-						</Flex>
-					</Container>
+					</Flex>
+					<Flex gap="lg" justify="center" align="center">
+						<Text>New here?</Text>
+						<Button variant="gradient">
+							<Link
+								to={
+									redirectTo
+										? `/signup?${encodeURIComponent(redirectTo)}`
+										: "/signup"
+								}
+							>
+								Create an account
+							</Link>
+						</Button>
+					</Flex>
 				</Box>
 			</Container>
 		</Flex>

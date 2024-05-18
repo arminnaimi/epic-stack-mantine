@@ -9,7 +9,7 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import {
 	getPasswordHash,
 	requireUserId,
@@ -21,11 +21,11 @@ import { redirectWithToast } from "#app/utils/toast.server.ts";
 import { PasswordSchema } from "#app/utils/user-validation.ts";
 import type { BreadcrumbHandle } from "./profile.tsx";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { Button, Grid } from "@radix-ui/themes";
+import { Button, PasswordInput, SimpleGrid } from "@mantine/core";
 
 export const handle: BreadcrumbHandle & SEOHandle = {
 	breadcrumb: (
-		<Button variant="ghost">
+		<Button variant="subtle">
 			<DotsHorizontalIcon /> Password
 		</Button>
 	),
@@ -140,41 +140,33 @@ export default function ChangePasswordRoute() {
 
 	return (
 		<Form method="POST" {...getFormProps(form)} className="mx-auto max-w-md">
-			<Field
-				labelProps={{ children: "Current Password" }}
-				inputProps={{
-					...getInputProps(fields.currentPassword, { type: "password" }),
-					autoComplete: "current-password",
-				}}
-				errors={fields.currentPassword.errors}
+			<PasswordInput
+				label="Current Password"
+				autoComplete="current-password"
+				error={fields.currentPassword.errors}
+				{...getInputProps(fields.currentPassword, { type: "password" })}
 			/>
-			<Field
-				labelProps={{ children: "New Password" }}
-				inputProps={{
-					...getInputProps(fields.newPassword, { type: "password" }),
-					autoComplete: "new-password",
-				}}
-				errors={fields.newPassword.errors}
+			<PasswordInput
+				label="New Password"
+				autoComplete="new-password"
+				error={fields.newPassword.errors}
+				{...getInputProps(fields.newPassword, { type: "password" })}
 			/>
-			<Field
-				labelProps={{ children: "Confirm New Password" }}
-				inputProps={{
-					...getInputProps(fields.confirmNewPassword, {
-						type: "password",
-					}),
-					autoComplete: "new-password",
-				}}
-				errors={fields.confirmNewPassword.errors}
+			<PasswordInput
+				label="Confirm New Password"
+				autoComplete="new-password"
+				error={fields.confirmNewPassword.errors}
+				{...getInputProps(fields.confirmNewPassword, { type: "password" })}
 			/>
 			<ErrorList id={form.errorId} errors={form.errors} />
-			<Grid columns="2" gap="6" width="100%">
-				<Button variant="outline" asChild>
-					<Link to="..">Cancel</Link>
+			<SimpleGrid cols={2} w="100%">
+				<Button variant="outline" component={Link} to="..">
+					Cancel
 				</Button>
 				<Button type="submit" loading={isPending}>
 					Change Password
 				</Button>
-			</Grid>
+			</SimpleGrid>
 		</Form>
 	);
 }

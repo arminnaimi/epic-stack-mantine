@@ -31,7 +31,7 @@ import { GeneralErrorBoundary } from "./components/error-boundary.tsx";
 import { EpicProgress } from "./components/progress-bar.tsx";
 import { SearchBar } from "./components/search-bar.tsx";
 import { useToast } from "./components/toaster.tsx";
-import "@radix-ui/themes/styles.css";
+import "@mantine/core/styles.css";
 import tailwindStyleSheetUrl from "./styles/tailwind.css?url";
 import { getUserId, logout } from "./utils/auth.server.ts";
 import { ClientHintCheck, getHints, useHints } from "./utils/client-hints.tsx";
@@ -41,17 +41,20 @@ import { honeypot } from "./utils/honeypot.server.ts";
 import { combineHeaders, getDomainUrl, getUserImgSrc } from "./utils/misc.tsx";
 import { useNonce } from "./utils/nonce-provider.ts";
 import { useRequestInfo } from "./utils/request-info.ts";
-import { type Theme, setTheme, getTheme } from "./utils/theme.server.ts";
 import { makeTimings, time } from "./utils/timing.server.ts";
 import { getToast } from "./utils/toast.server.ts";
 import { useOptionalUser, useUser } from "./utils/user.ts";
 import {
-	Theme as RadixTheme,
-	DropdownMenu,
 	Button,
-	IconButton,
+	ActionIcon,
 	Flex,
-} from "@radix-ui/themes";
+	Menu,
+	MantineProvider,
+	ColorSchemeScript,
+	Container,
+	useMantineColorScheme,
+	useComputedColorScheme,
+} from "@mantine/core";
 import {
 	Pencil2Icon,
 	AvatarIcon,
@@ -61,6 +64,7 @@ import {
 	LaptopIcon,
 } from "@radix-ui/react-icons";
 import { EpicToaster } from "./components/ui/sonner.tsx";
+import { resolver, theme as mantineTheme } from "./theme/theme.ts";
 
 export const links: LinksFunction = () => {
 	return [
@@ -137,9 +141,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				hints: getHints(request),
 				origin: getDomainUrl(request),
 				path: new URL(request.url).pathname,
-				userPrefs: {
-					theme: getTheme(request),
-				},
 			},
 			ENV: getEnv(),
 			toast,
@@ -161,36 +162,14 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 	return headers;
 };
 
-const ThemeFormSchema = z.object({
-	theme: z.enum(["system", "light", "dark"]),
-});
-
-export async function action({ request }: ActionFunctionArgs) {
-	const formData = await request.formData();
-	const submission = parseWithZod(formData, {
-		schema: ThemeFormSchema,
-	});
-
-	invariantResponse(submission.status === "success", "Invalid theme received");
-
-	const { theme } = submission.value;
-
-	const responseInit = {
-		headers: { "set-cookie": setTheme(theme) },
-	};
-	return json({ result: submission.reply() }, responseInit);
-}
-
 function Document({
 	children,
 	nonce,
-	theme = "light",
 	env = {},
 	allowIndexing = true,
 }: {
 	children: React.ReactNode;
 	nonce: string;
-	theme?: Theme;
 	env?: Record<string, string>;
 	allowIndexing?: boolean;
 }) {
@@ -205,16 +184,16 @@ function Document({
 					<meta name="robots" content="noindex, nofollow" />
 				)}
 				<Links />
+				<ColorSchemeScript nonce={nonce} defaultColorScheme="auto" />
 			</head>
 			<body>
-				<RadixTheme
-					appearance={theme}
-					accentColor="mint"
-					grayColor="olive"
-					radius="full"
+				<MantineProvider
+					theme={mantineTheme}
+					cssVariablesResolver={resolver}
+					defaultColorScheme="auto"
 				>
 					{children}
-				</RadixTheme>
+				</MantineProvider>
 				<script
 					nonce={nonce}
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
@@ -233,7 +212,6 @@ function App() {
 	const data = useLoaderData<typeof loader>();
 	const nonce = useNonce();
 	const user = useOptionalUser();
-	const theme = data.requestInfo.userPrefs.theme ?? undefined;
 	const matches = useMatches();
 	const isOnSearchPage = matches.find((m) => m.id === "routes/users+/index");
 	const searchBar = isOnSearchPage ? null : <SearchBar status="idle" />;
@@ -241,42 +219,50 @@ function App() {
 	useToast(data.toast);
 
 	return (
-		<Document
-			nonce={nonce}
-			theme={theme}
-			allowIndexing={allowIndexing}
-			env={data.ENV}
-		>
-			<Flex height="100vh" direction="column" justify="between">
-				<header className="container py-6">
-					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
+		<Document nonce={nonce} allowIndexing={allowIndexing} env={data.ENV}>
+			<Flex h="100vh" direction="column" justify="space-between">
+				<Container size="xl" component="header" py="xs" w="100%">
+					<Flex
+						component="nav"
+						wrap={{ base: "wrap", sm: "nowrap" }}
+						align="center"
+						justify="space-between"
+						gap={{
+							base: "md",
+							md: "lg",
+						}}
+					>
 						<Logo />
-						<div className="ml-auto hidden max-w-sm flex-1 sm:block">
-							{searchBar}
-						</div>
-						<div className="flex items-center gap-10">
-							{user ? (
-								<UserDropdown />
-							) : (
-								<Button asChild size="3">
-									<Link to="/login">Log In</Link>
-								</Button>
-							)}
-						</div>
+						<Flex gap="sm">
+							<div className="ml-auto hidden max-w-sm flex-1 sm:block">
+								{searchBar}
+							</div>
+							<Flex align="center">
+								{user ? (
+									<UserDropdown />
+								) : (
+									<Button component={Link} to="/login">
+										Log In
+									</Button>
+								)}
+							</Flex>
+						</Flex>
 						<div className="block w-full sm:hidden">{searchBar}</div>
-					</nav>
-				</header>
+					</Flex>
+				</Container>
 
 				<div className="flex-1">
 					<Outlet />
 				</div>
 
-				<div className="container flex justify-between pb-5">
-					<Logo />
-					<ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-				</div>
+				<Container size="xl" w="100%" pb="md">
+					<Flex gap="lg" justify="space-between" align="center">
+						<Logo />
+						<ThemeSwitch />
+					</Flex>
+				</Container>
 			</Flex>
-			<EpicToaster closeButton position="top-center" theme={theme} />
+			<EpicToaster closeButton position="top-center" />
 			<EpicProgress />
 		</Document>
 	);
@@ -311,55 +297,60 @@ function UserDropdown() {
 	const submit = useSubmit();
 	const formRef = useRef<HTMLFormElement>(null);
 	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
-				<Button asChild variant="soft">
-					<Link
-						to={`/users/${user.username}`}
-						// this is for progressive enhancement
-						onClick={(e) => e.preventDefault()}
-						className="flex items-center gap-2"
-					>
-						<img
-							className="h-8 w-8 rounded-full object-cover"
-							alt={user.name ?? user.username}
-							src={getUserImgSrc(user.image?.id)}
-						/>
-						<span className="text-body-sm font-bold">
-							{user.name ?? user.username}
-						</span>
-					</Link>
+		<Menu>
+			<Menu.Target>
+				<Button
+					component={Link}
+					variant="soft"
+					to={`/users/${user.username}`}
+					// this is for progressive enhancement
+					onClick={(e) => e.preventDefault()}
+					className="flex items-center gap-2"
+				>
+					<img
+						className="h-8 w-8 rounded-full object-cover"
+						alt={user.name ?? user.username}
+						src={getUserImgSrc(user.image?.id)}
+					/>
+					<span className="text-body-sm font-bold">
+						{user.name ?? user.username}
+					</span>
 				</Button>
-			</DropdownMenu.Trigger>
+			</Menu.Target>
 
-			<DropdownMenu.Content sideOffset={8} align="start">
-				<DropdownMenu.Item asChild>
-					<Link prefetch="intent" to={`/users/${user.username}`}>
-						<AvatarIcon />
-						Profile
-					</Link>
-				</DropdownMenu.Item>
-				<DropdownMenu.Item asChild>
-					<Link prefetch="intent" to={`/users/${user.username}/notes`}>
-						<Pencil2Icon />
-						Notes
-					</Link>
-				</DropdownMenu.Item>
-				<DropdownMenu.Item
-					asChild
+			<Menu.Dropdown>
+				<Menu.Item
+					component={Link}
+					prefetch="intent"
+					to={`/users/${user.username}`}
+					leftSection={<AvatarIcon />}
+				>
+					Profile
+				</Menu.Item>
+				<Menu.Item
+					component={Link}
+					prefetch="intent"
+					to={`/users/${user.username}/notes`}
+					leftSection={<Pencil2Icon />}
+				>
+					Notes
+				</Menu.Item>
+				<Menu.Item
+					component={Form}
 					// this prevents the menu from closing before the form submission is completed
 					onSelect={(event) => {
 						event.preventDefault();
 						submit(formRef.current);
 					}}
+					leftSection={<ExitIcon />}
+					action="/logout"
+					method="POST"
+					ref={formRef}
 				>
-					<Form action="/logout" method="POST" ref={formRef}>
-						<ExitIcon />
-						<button type="submit">Logout</button>
-					</Form>
-				</DropdownMenu.Item>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+					<button type="submit">Logout</button>
+				</Menu.Item>
+			</Menu.Dropdown>
+		</Menu>
 	);
 }
 
@@ -382,33 +373,30 @@ export function useOptimisticThemeMode() {
 	}
 }
 
-function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
-	const fetcher = useFetcher<typeof action>();
+function ThemeSwitch() {
+	// -> colorScheme is 'auto' | 'light' | 'dark'
+	const { colorScheme, setColorScheme } = useMantineColorScheme();
 
-	const [form] = useForm({
-		id: "theme-switch",
-		lastResult: fetcher.data?.result,
-	});
+	// -> computedColorScheme is 'light' | 'dark', argument is the default value
+	const computedColorScheme = useComputedColorScheme("light");
 
-	const optimisticMode = useOptimisticThemeMode();
-	const mode = optimisticMode ?? userPreference ?? "system";
-	const nextMode =
-		mode === "system" ? "light" : mode === "light" ? "dark" : "system";
+	// Incorrect color scheme toggle implementation
+	// If colorScheme is 'auto', then it is not possible to
+	// change color scheme correctly in all cases:
+	// 'auto' can mean both light and dark
+	const toggleColorScheme = () => {
+		setColorScheme(colorScheme === "dark" ? "light" : "dark");
+	};
+
 	const modeLabel = {
 		light: <SunIcon />,
 		dark: <MoonIcon />,
-		system: <LaptopIcon />,
 	};
 
 	return (
-		<fetcher.Form method="POST" {...getFormProps(form)}>
-			<input type="hidden" name="theme" value={nextMode} />
-			<div className="flex gap-2">
-				<IconButton variant="soft" type="submit">
-					{modeLabel[mode]}
-				</IconButton>
-			</div>
-		</fetcher.Form>
+		<ActionIcon onClick={toggleColorScheme} variant="soft">
+			{modeLabel[computedColorScheme]}
+		</ActionIcon>
 	);
 }
 

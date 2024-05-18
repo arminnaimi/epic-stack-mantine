@@ -6,6 +6,7 @@ import { ErrorList } from "#app/components/forms.tsx";
 import { SearchBar } from "#app/components/search-bar.tsx";
 import { prisma } from "#app/utils/db.server.ts";
 import { cn, getUserImgSrc, useDelayedIsPending } from "#app/utils/misc.tsx";
+import { Container, Title } from "@mantine/core";
 
 const UserSearchResultSchema = z.object({
 	id: z.string(),
@@ -60,8 +61,8 @@ export default function UsersRoute() {
 	}
 
 	return (
-		<div className="container mb-48 mt-36 flex flex-col items-center justify-center gap-6">
-			<h1 className="text-h1">Epic Notes Users</h1>
+		<Container className="mb-48 mt-36 flex flex-col items-center justify-center gap-6">
+			<Title>Epic Notes Users</Title>
 			<div className="w-full max-w-[700px]">
 				<SearchBar status={data.status} autoFocus autoSubmit />
 			</div>
@@ -104,7 +105,7 @@ export default function UsersRoute() {
 					<ErrorList errors={["There was an error parsing the results"]} />
 				) : null}
 			</main>
-		</div>
+		</Container>
 	);
 }
 

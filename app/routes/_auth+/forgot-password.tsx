@@ -11,7 +11,7 @@ import { Link, useFetcher } from "@remix-run/react";
 import { HoneypotInputs } from "remix-utils/honeypot/react";
 import { z } from "zod";
 import { GeneralErrorBoundary } from "#app/components/error-boundary.tsx";
-import { ErrorList, Field } from "#app/components/forms.tsx";
+import { ErrorList } from "#app/components/forms.tsx";
 import { prisma } from "#app/utils/db.server.ts";
 import { sendEmail } from "#app/utils/email.server.ts";
 import { checkHoneypot } from "#app/utils/honeypot.server.ts";
@@ -22,11 +22,11 @@ import {
 	Button,
 	Container,
 	Flex,
-	Heading,
 	Text,
-	Link as RadixLink,
-	Section,
-} from "@radix-ui/themes";
+	Title,
+	Anchor,
+	TextInput,
+} from "@mantine/core";
 
 const ForgotPasswordSchema = z.object({
 	usernameOrEmail: z.union([EmailSchema, UsernameSchema]),
@@ -142,28 +142,23 @@ export default function ForgotPasswordRoute() {
 		<Container>
 			<Flex direction="column" justify="center">
 				<Box className="text-center">
-					<Heading size="8">Forgot Password</Heading>
-					<Text size="5">No worries, we'll send you reset instructions.</Text>
+					<Title>Forgot Password</Title>
+					<Text>No worries, we'll send you reset instructions.</Text>
 				</Box>
-				<Container size="1">
+				<Container>
 					<forgotPassword.Form method="POST" {...getFormProps(form)}>
 						<HoneypotInputs />
 						<Box>
-							<Field
-								labelProps={{
-									htmlFor: fields.usernameOrEmail.id,
-									children: "Username or Email",
-								}}
-								inputProps={{
-									autoFocus: true,
-									...getInputProps(fields.usernameOrEmail, { type: "text" }),
-								}}
-								errors={fields.usernameOrEmail.errors}
+							<TextInput
+								label="Username or Email"
+								autoFocus={true}
+								{...getInputProps(fields.usernameOrEmail, { type: "text" })}
+								error={fields.usernameOrEmail.errors}
 							/>
 						</Box>
 						<ErrorList errors={form.errors} id={form.errorId} />
 
-						<Box mt="6">
+						<Box mt="lg">
 							<Button
 								type="submit"
 								loading={forgotPassword.state === "submitting"}
@@ -173,9 +168,9 @@ export default function ForgotPasswordRoute() {
 							</Button>
 						</Box>
 					</forgotPassword.Form>
-					<RadixLink asChild>
-						<Link to="/login">Back to Login</Link>
-					</RadixLink>
+					<Anchor component={Link} to="/login">
+						Back to Login
+					</Anchor>
 				</Container>
 			</Flex>
 		</Container>

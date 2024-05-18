@@ -29,10 +29,12 @@ import {
 	Button,
 	Flex,
 	Grid,
-	Heading,
+	Group,
 	ScrollArea,
+	SimpleGrid,
 	Text,
-} from "@radix-ui/themes";
+	Title,
+} from "@mantine/core";
 import { ClockIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -116,55 +118,56 @@ export default function NoteRoute() {
 	const displayBar = canDelete || isOwner;
 
 	return (
-		<Flex direction="column" position="absolute" inset="0">
-			<Flex justify="between" pt="4" px="4">
-				<Heading size="8">{data.note.title}</Heading>
+		<Flex direction="column" pos="absolute" inset="0">
+			<Group justify="space-between" align="stretch" pt="md">
+				<Title>{data.note.title}</Title>
 				{displayBar ? (
-					<Flex align="center" gap="3">
-						<Flex align="center" gap="2">
+					<Flex align="center" gap="sm">
+						<Flex align="center" gap="sm">
 							<ClockIcon className="scale-125" />
-							<Text size="2">{data.timeAgo} ago</Text>
+							<Text>{data.timeAgo} ago</Text>
 						</Flex>
-						<Grid
-							flexShrink="1"
-							columns="2"
-							justify="end"
-							gap={{ initial: "1", md: "2" }}
-						>
+						<SimpleGrid cols={2} spacing={{ base: "xs", md: "sm" }}>
 							{canDelete ? <DeleteNote id={data.note.id} /> : null}
-							<Button asChild>
-								<Link to="edit">
+
+							<Button
+								leftSection={
 									<Pencil1Icon
 										name="pencil-1"
 										className="scale-125 max-md:scale-150"
 									/>
-									<span className="max-md:hidden">Edit</span>
-								</Link>
+								}
+								component={Link}
+								to="edit"
+							>
+								<span className="max-md:hidden">Edit</span>
 							</Button>
-						</Grid>
+						</SimpleGrid>
 					</Flex>
 				) : null}
-			</Flex>
+			</Group>
 
-			<ScrollArea scrollbars="vertical">
-				<Box p="4">
-					<Box pb={displayBar ? "4" : "2"}>
-						<Flex wrap="wrap" gap="5" py="5">
-							{data.note.images.map((image) => (
-								<a key={image.id} href={getNoteImgSrc(image.id)}>
-									<img
-										src={getNoteImgSrc(image.id)}
-										alt={image.altText ?? ""}
-										className="h-32 w-32 rounded-lg object-cover"
-									/>
-								</a>
-							))}
-						</Flex>
+			<Box>
+				<ScrollArea.Autosize mah={500} offsetScrollbars scroll scrollbars="y">
+					<Box p="4">
+						<Box pb={displayBar ? "4" : "2"}>
+							<Flex wrap="wrap" gap="lg" py="5">
+								{data.note.images.map((image) => (
+									<a key={image.id} href={getNoteImgSrc(image.id)}>
+										<img
+											src={getNoteImgSrc(image.id)}
+											alt={image.altText ?? ""}
+											className="h-32 w-32 rounded-lg object-cover"
+										/>
+									</a>
+								))}
+							</Flex>
+						</Box>
+
+						<Text className="whitespace-break-spaces">{data.note.content}</Text>
 					</Box>
-
-					<Text className="whitespace-break-spaces">{data.note.content}</Text>
-				</Box>
-			</ScrollArea>
+				</ScrollArea.Autosize>
+			</Box>
 		</Flex>
 	);
 }
@@ -187,8 +190,8 @@ export function DeleteNote({ id }: { id: string }) {
 				color="red"
 				loading={isPending}
 				disabled={isPending}
+				leftSection={<TrashIcon className="scale-125 max-md:scale-150" />}
 			>
-				<TrashIcon className="scale-125 max-md:scale-150" />
 				<span className="max-md:hidden">Delete</span>
 			</Button>
 			<ErrorList errors={form.errors} id={form.errorId} />

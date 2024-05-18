@@ -1,5 +1,5 @@
 import { cn } from "#app/utils/misc";
-import { Spinner } from "@radix-ui/themes";
+import { Loader } from "@mantine/core";
 import { useNavigation } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import { useSpinDelay } from "spin-delay";
@@ -48,7 +48,7 @@ function EpicProgress() {
 			/>
 			{delayedPending ? (
 				<div className="absolute flex items-center justify-center">
-					<Spinner />
+					<Loader />
 				</div>
 			) : null}
 		</div>
